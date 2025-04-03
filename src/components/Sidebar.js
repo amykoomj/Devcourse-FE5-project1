@@ -8,25 +8,25 @@ export default function Sidebar({ $app, initialState }) {
   this.template = () => {
     let temp = `
       <div class="sideBar">
-        <div class="header">
-          <div class="profile">
-            <img class="picture" />
-            <div class="name">Devcourse</div>
-            <div class="description">FE5 1차 팀프로젝트</div>
-          </div>
-          <button class="setting">설정</button>
-        </div>
-        <form class="search">
-          <img />
-          <input type="text" placeholder="검색" />
-        </form>
-        <div class="documents">
-          페이지가 없어요. 아래 페이지 추가 버튼을 눌러 페이지를 추가해주세요.
-        </div>
-        <div class="footer">
-          <button class="addPage"><img />페이지 추가</button>
-          <div class="info">?</div>
-        </div>
+            <div class="header">
+                <div class="profile">
+                    <img class="picture">
+                    <div class="name">Devcourse</div>
+                    <div class="description">FE5 1차 팀프로젝트</div>
+                </div>
+                <button class="setting">설정</button>
+            </div>
+            <form class="search">
+                <img>
+                <input type="text" placeholder="검색">
+            </form>
+            <div class="documents">
+                <ul></ul>
+            </div>
+            <div class="footer">
+                <button class="addPage"><img>페이지 추가</button>
+                <div class="info">?</div>
+            </div>
       </div>
     `;
     return temp;
@@ -34,13 +34,17 @@ export default function Sidebar({ $app, initialState }) {
 
   this.render = () => {
     this.$target.innerHTML = this.template();
-
+  
     const addPage = this.$target.querySelector('.addPage');
     const documentList = this.$target.querySelector('.documents ul');
-    
+    const searchInput= this.$target.querySelector('.search input');
+
     addPage.addEventListener('click',async()=>{
       await fetchData(documentList);      
     })
+
+    searchInput.addEventListener('input',filter);
+
   };
     
   const fetchData = async (documentList)=>{
@@ -65,7 +69,6 @@ export default function Sidebar({ $app, initialState }) {
         
         const newDocument = document.createElement('li');
         const documentLink = document.createElement('a');
-
         documentLink.href=`${data.id}`;
         documentLink.textContent=data.title;
         newDocument.appendChild(documentLink);
@@ -77,11 +80,19 @@ export default function Sidebar({ $app, initialState }) {
         console.error(error);
     }
   };
+  //a href 의 textContent가 제목이니까 forEach로 일치하면 보이도록(on활용해야하나?)
+  const filter=()=>{
+    const searchTerm=searchInput.value.trim().toLowerCase(); //띄어쓰기 상관없이
+    const links=Array.from(documentList.querySelectorAll("li"));
+    links.forEach(link=>{
+      const pageTitle=link.getElementsByTagName("a").textContent.toLowerCase();
+      link.style.display=pageTitle.includes(searchTerm) ? "":'none';
+    });
+  };
+
 
   this.setState = (newState) => {
     this.state = newState;
     this.render();
   };
-
-  
 }
