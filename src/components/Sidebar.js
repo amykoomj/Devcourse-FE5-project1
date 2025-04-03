@@ -9,25 +9,31 @@ export default function Sidebar({ $app, initialState }) {
     let temp = `
       <div class="sideBar">
             <div class="header">
+                <img class="picture" src="./images/profile.png" />
                 <div class="profile">
-                    <img class="picture">
-                    <div class="name">Devcourse</div>
-                    <div class="description">FE5 1차 팀프로젝트</div>
+                  <div class="name">Devcourse</div>
+                  <div class="description">FE5 1차 팀프로젝트</div>
                 </div>
-                <button class="setting">설정</button>
+<!--                 <button class="setting"></button> -->
             </div>
             <form class="search">
-                <img>
                 <input type="text" placeholder="검색">
             </form>
             <div class="documents">
-                <ul></ul>
+                <ul>
+                </ul>
             </div>
             <div class="footer">
-                <button class="addPage"><img>페이지 추가</button>
-                <div class="info">?</div>
+                <button class="addPage">페이지 추가</button>
+                <div class="info">
+                    <div class="none">
+                        2025.04.04 / Team 1 <br>
+                        강하영, 구민지, 권유정, 박상윤, 주경록, 한상아
+                    </div>
+                </div>
             </div>
-      </div>
+
+        </div>
     `;
     return temp;
   };
@@ -41,7 +47,7 @@ export default function Sidebar({ $app, initialState }) {
 
     addPage.addEventListener('click',async()=>{
       await fetchData(documentList);      
-    })
+    });
 
     searchInput.addEventListener('input',filter);
 
@@ -69,7 +75,7 @@ export default function Sidebar({ $app, initialState }) {
         
         const newDocument = document.createElement('li');
         const documentLink = document.createElement('a');
-        documentLink.href=`${data.id}`;
+        documentLink.href=`./documents/${data.id}`;//
         documentLink.textContent=data.title;
         newDocument.appendChild(documentLink);
         
@@ -80,13 +86,19 @@ export default function Sidebar({ $app, initialState }) {
         console.error(error);
     }
   };
-  //a href 의 textContent가 제목이니까 forEach로 일치하면 보이도록(on활용해야하나?)
+  
   const filter=()=>{
-    const searchTerm=searchInput.value.trim().toLowerCase(); //띄어쓰기 상관없이
+    const searchInput = this.$target.querySelector(".search input");
+    const documentList = this.$target.querySelector(".documents ul");
+
+    const searchTerm=searchInput.value.trim().toLowerCase(); 
     const links=Array.from(documentList.querySelectorAll("li"));
-    links.forEach(link=>{
-      const pageTitle=link.getElementsByTagName("a").textContent.toLowerCase();
-      link.style.display=pageTitle.includes(searchTerm) ? "":'none';
+    links.forEach((link)=>{
+      const documentLink=link.querySelector("a");
+      if(!documentLink) return;
+
+      const pageTitle=documentLink.textContent.toLowerCase();
+      link.style.display=pageTitle.includes(searchTerm) ? "":"none";
     });
   };
 
@@ -95,4 +107,6 @@ export default function Sidebar({ $app, initialState }) {
     this.state = newState;
     this.render();
   };
+
+  this.render();
 }
