@@ -34,6 +34,48 @@ export default function Sidebar({ $app, initialState }) {
 
   this.render = () => {
     this.$target.innerHTML = this.template();
+
+    const addPage = this.$target.querySelector('.addPage');
+    const documentList = this.$target.querySelector('.documents ul');
+    
+    addPage.addEventListener('click',async()=>{
+      await fetchData(documentList);      
+    })
+  };
+    
+  const fetchData = async (documentList)=>{
+    try {
+        const response = await fetch("https://kdt-api.fe.dev-cos.com/documents", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "x-username": "team_01", //
+          },
+          body: JSON.stringify({
+              title: "파일 제목",
+              parent: null,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok!");
+        }
+
+        const data = await response.json();
+        
+        const newDocument = document.createElement('li');
+        const documentLink = document.createElement('a');
+
+        documentLink.href=`${data.id}`;
+        documentLink.textContent=data.title;
+        newDocument.appendChild(documentLink);
+        
+        if(documentList){
+          documentList.appendChild(newDocument);
+        }        
+    } catch (error) {
+        console.error(error);
+    }
   };
 
   this.setState = (newState) => {
@@ -41,5 +83,5 @@ export default function Sidebar({ $app, initialState }) {
     this.render();
   };
 
-  this.render();
+  
 }
